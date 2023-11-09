@@ -6,5 +6,5 @@ function sendKeyCombo(keyCombo) {
         headers: {"Content-Type": "application/json"},
         mode: "cors"
     };
-    fetch("http://localhost:5000/keycombo", request).then(a => a.text()).then(b=> console.log(JSON.parse(b)));
+    fetch("http://localhost:5000/keycombination", request).then(a => a.text()).then(b=> console.log(JSON.parse(b)));
 }

@@ -3,7 +3,7 @@ import usb_gadget
 from keydictionary import keys
 
 
-def setupkeyboard():
+def setup_keyboard():
     local_gadget = usb_gadget.USBGadget('test_gadget')
     local_gadget.idVendor = '0x1d6b'
     local_gadget.idProduct = '0x0104'
@@ -20,7 +20,7 @@ def setupkeyboard():
     config.MaxPower = '250'
     config['strings']['0x409'].configuration = 'Test Configuration'
 
-    usbadget_function = usb_gadget.HIDFunction(local_gadget, 'keyboard0')
+    usb_gadget_function = usb_gadget.HIDFunction(local_gadget, 'keyboard0')
     descriptor = [
         0x05, 0x01,  # Usage Page (Generic Desktop Ctrls)
         0x09, 0x06,  # Usage (Keyboard)
@@ -46,43 +46,43 @@ def setupkeyboard():
         0x81, 0x00,  # Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
         0xC0,  # End Collection
     ]
-    usbadget_function.protocol = '0'
-    usbadget_function.subclass = '0'
-    usbadget_function.report_length = '8'
-    usbadget_function.report_desc = bytes(descriptor)
-    local_gadget.link(usbadget_function, config)
+    usb_gadget_function.protocol = '0'
+    usb_gadget_function.subclass = '0'
+    usb_gadget_function.report_length = '8'
+    usb_gadget_function.report_desc = bytes(descriptor)
+    local_gadget.link(usb_gadget_function, config)
 
     local_gadget.activate()
-    local_keyboard = usb_gadget.KeyboardGadget(usbadget_function.device, 6)
+    local_keyboard = usb_gadget.KeyboardGadget(usb_gadget_function.device, 6)
 
     return {"keyboard": local_keyboard, "gadget": local_gadget}
 
 
-gadgetSetup = setupkeyboard()
+gadgetSetup = setup_keyboard()
 keyboard = gadgetSetup["keyboard"]
 gadget = gadgetSetup["gadget"]
 
 
-def translatekey(key: str) -> str:
+def translate_key(key: str) -> str:
     if key not in keys:
         return key
     else:
         return keys.get(key)
 
 
-def translatekeycombination(splitkeycombination: list[str]) -> list[str]:
-    translatedkeycombination: list[str] = []
-    for key in splitkeycombination:
-        translatedkeycombination.append(translatekey(key))
-    return translatedkeycombination
+def translate_key_combination(split_key_combination: list[str]) -> list[str]:
+    translated_key_combination: list[str] = []
+    for key in split_key_combination:
+        translated_key_combination.append(translate_key(key))
+    return translated_key_combination
 
 
-def executekeycombo(keycombination: str) -> None:
-    splitkeycombination: list[str] = keycombination.split("%+")
-    translatedkeycombination: list[str] = translatekeycombination(splitkeycombination)
+def execute_key_combination(key_combination: str) -> None:
+    split_key_combination: list[str] = key_combination.split("%+")
+    translated_key_combination: list[str] = translate_key_combination(split_key_combination)
 
-    for key in translatedkeycombination:
+    for key in translated_key_combination:
         keyboard.press(key)
 
-    for key in translatedkeycombination:
+    for key in translated_key_combination:
         keyboard.release(key)

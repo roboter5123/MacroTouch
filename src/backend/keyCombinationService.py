@@ -1,25 +1,26 @@
 import usb_gadget
+
 from keydictionary import keys
 
 
 def setupkeyboard():
-    gadget = usb_gadget.USBGadget('test_gadget')
-    gadget.idVendor = '0x1d6b'
-    gadget.idProduct = '0x0104'
-    gadget.bcdDevice = '0x0100'
-    gadget.bcdUSB = '0x0200'
+    local_gadget = usb_gadget.USBGadget('test_gadget')
+    local_gadget.idVendor = '0x1d6b'
+    local_gadget.idProduct = '0x0104'
+    local_gadget.bcdDevice = '0x0100'
+    local_gadget.bcdUSB = '0x0200'
 
-    strings = gadget['strings']['0x409']
+    strings = local_gadget['strings']['0x409']
     strings.serialnumber = '0000000001'
     strings.manufacturer = 'roboter5123'
     strings.product = 'MacroTouch'
 
-    config = gadget['configs']['c.1']
+    config = local_gadget['configs']['c.1']
     config.bmAttributes = '0x80'
     config.MaxPower = '250'
     config['strings']['0x409'].configuration = 'Test Configuration'
 
-    function = usb_gadget.HIDFunction(gadget, 'keyboard0')
+    usbadget_function = usb_gadget.HIDFunction(local_gadget, 'keyboard0')
     descriptor = [
         0x05, 0x01,  # Usage Page (Generic Desktop Ctrls)
         0x09, 0x06,  # Usage (Keyboard)
@@ -45,16 +46,16 @@ def setupkeyboard():
         0x81, 0x00,  # Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
         0xC0,  # End Collection
     ]
-    function.protocol = '0'
-    function.subclass = '0'
-    function.report_length = '8'
-    function.report_desc = bytes(descriptor)
-    gadget.link(function, config)
+    usbadget_function.protocol = '0'
+    usbadget_function.subclass = '0'
+    usbadget_function.report_length = '8'
+    usbadget_function.report_desc = bytes(descriptor)
+    local_gadget.link(usbadget_function, config)
 
-    gadget.activate()
-    keyboard = usb_gadget.KeyboardGadget(function.device, 6)
+    local_gadget.activate()
+    local_keyboard = usb_gadget.KeyboardGadget(usbadget_function.device, 6)
 
-    return {"keyboard": keyboard, "gadget": gadget}
+    return {"keyboard": local_keyboard, "gadget": local_gadget}
 
 
 gadgetSetup = setupkeyboard()
@@ -77,8 +78,8 @@ def translatekeycombination(splitkeycombination: list[str]) -> list[str]:
 
 
 def executekeycombo(keycombination: str) -> None:
-    splitkeycombination: List[str] = keycombination.split("%+")
-    translatedkeycombination: List[str] = translatekeycombination(splitkeycombination)
+    splitkeycombination: list[str] = keycombination.split("%+")
+    translatedkeycombination: list[str] = translatekeycombination(splitkeycombination)
 
     for key in translatedkeycombination:
         keyboard.press(key)

@@ -57,6 +57,11 @@ def setupkeyboard():
     return {"keyboard": keyboard, "gadget": gadget}
 
 
+gadgetSetup = setupkeyboard()
+keyboard = gadgetSetup["keyboard"]
+gadget = gadgetSetup["gadget"]
+
+
 def translatekey(key: str) -> str:
     if key not in keys:
         return key
@@ -71,23 +76,12 @@ def translatekeycombination(splitkeycombination: list[str]) -> list[str]:
     return translatedkeycombination
 
 
-class KeyCombinationService:
-    gadgetSetup = setupkeyboard()
-    keyboard = gadgetSetup["keyboard"]
-    gadget = gadgetSetup["gadget"]
+def executekeycombo(keycombination: str) -> None:
+    splitkeycombination: List[str] = keycombination.split("%+")
+    translatedkeycombination: List[str] = translatekeycombination(splitkeycombination)
 
-    def executekeycombo(self, keycombination: str) -> None:
-        splitkeycombination: List[str] = keycombination.split("%+")
-        translatedkeycombination: List[str] = translatekeycombination(splitkeycombination)
+    for key in translatedkeycombination:
+        keyboard.press(key)
 
-        for key in translatedkeycombination:
-            self.keyboard.press(key)
-
-        for key in translatedkeycombination:
-            self.keyboard.release(key)
-
-    def __del__(self):
-        self.gadget.destroy()
-
-    def __init__(self):
-        pass
+    for key in translatedkeycombination:
+        keyboard.release(key)

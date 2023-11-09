@@ -9,7 +9,7 @@ CORS(app)
 key_combo_service: KeyCombinationService = KeyCombinationService()
 
 @app.route('/keycombination', methods=['POST'])
-def keycombination():
+def executekeycombination() -> None:
     key_combination_ = request.json["keyCombination"]
     key_combo_service.executekeycombo(key_combination_)
 
